@@ -281,10 +281,13 @@ class Disk
         $path = urlencode($path);
 
         $uri = 'https://cloud-api.yandex.net/v1/disk/resources/upload?path=' . $path . "&overwrite=" . $overwrite;
-        $request = $this->client->request('GET', $uri, ['headers' => $this->headers]);
+        $request = $this->client->request('GET', $uri, [
+            'headers' => $this->headers,
+            'http_errors' => false
+        ]);
         $response =  $request->getBody()->getContents();
-        $response = json_decode($response);
-        return $response->href;
+        $response = json_decode($response, true);
+        return $response;
     }
 
 
@@ -295,18 +298,13 @@ class Disk
     public function uploadFile($file, $path, $overwrite = false)
     {
         $uri = $this->getUploadUrl($path, $overwrite);
-
-        // $headers['Content-Length'] = filesize($file);
-        // $finfo = finfo_open(FILEINFO_MIME);
-        // $mime = finfo_file($finfo, $file);
-        // $parts = explode(';', $mime);
-        // $headers['Content-Type'] = $parts[0];
-        // $headers['Etag'] = md5_file($file);
-        // $headers['Sha256'] = hash_file('sha256', $file);
-
+        if(isset($uri['error']))
+        {
+            return $uri;
+        }
         $request = $this->client->request(
             'PUT',
-            $uri,
+            $uri['href'],
             [
                 'body' => $file,
                 'expect' => true,
@@ -340,7 +338,7 @@ class Disk
         $request = $this->client->request('GET', $uri, ['headers' => $this->headers]);
         $response = $request->getBody()->getContents();
         $href = json_decode($response)->href;
-
+        // return copy($href, $path);
         return $href;
     }
 
