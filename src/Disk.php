@@ -298,8 +298,7 @@ class Disk
     public function uploadFile($file, $path, $overwrite = false)
     {
         $uri = $this->getUploadUrl($path, $overwrite);
-        if(isset($uri['error']))
-        {
+        if (isset($uri['error'])) {
             return $uri;
         }
         $request = $this->client->request(
@@ -358,11 +357,27 @@ class Disk
 
     public function saveToDisk($path)
     {
-        $key = urlencode($key);
         $uri = 'https://cloud-api.yandex.net/v1/disk/public/resources/save-to-disk/?public_key=' . $path;
         $request = $this->client->request('POST', $uri, ['headers' => $this->headers]);
         $response = $request->getBody()->getContents();
         return $response;
+    }
+
+    public function getImagePreview($path)
+    {
+        $headers = $this->headers;
+        $headers['User-Agent'] = 'my_application/0.0.1';
+        $request = $this->client->request(
+            'GET',
+            "https://webdav.yandex.ru/{$path}?preview&size=90",
+            [
+                'headers' => $headers,
+                'http_errors' => false
+            ]
+        );
+        $response = $request->getBody()->getContents();
+        $base64 = base64_encode($response);
+        return $base64;
     }
 
     /**
