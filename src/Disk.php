@@ -380,6 +380,23 @@ class Disk
         return $base64;
     }
 
+    public function getFileWebDav($path)
+    {
+        $headers = $this->headers;
+        $headers['User-Agent'] = 'my_application/0.0.1';
+        $headers['Accept-Encoding'] = 'gzip';
+        $request = $this->client->request(
+            'GET',
+            "https://webdav.yandex.ru/{$path}",
+            [
+                'headers' => $headers,
+                // 'http_errors' => false
+            ]
+        );
+        $response = $request->getBody()->getContents();
+        $base64 = base64_encode($response);
+        return $base64;
+    }
     /**
      * @return string
      */
