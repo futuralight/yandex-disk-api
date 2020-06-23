@@ -363,13 +363,13 @@ class Disk
         return $response;
     }
 
-    public function getImagePreview($path)
+    public function getImagePreview($path, $size = '300x400')
     {
         $headers = $this->headers;
         $headers['User-Agent'] = 'my_application/0.0.1';
         $request = $this->client->request(
             'GET',
-            "https://webdav.yandex.ru/{$path}?preview&size=90",
+            "https://webdav.yandex.ru/{$path}?preview&size={$size}",
             [
                 'headers' => $headers,
                 'http_errors' => false
