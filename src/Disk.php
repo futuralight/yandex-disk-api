@@ -376,8 +376,13 @@ class Disk
             ]
         );
         $response = $request->getBody()->getContents();
-        $base64 = base64_encode($response);
-        return $base64;
+        if($request->getStatusCode() !== 404){
+            $base64 = base64_encode($response);
+            return $base64;
+        }
+        else{
+            return $this->getFileWebDav($path);
+        }
     }
 
     public function getFileWebDav($path)
@@ -390,7 +395,7 @@ class Disk
             "https://webdav.yandex.ru/{$path}",
             [
                 'headers' => $headers,
-                // 'http_errors' => false
+                'http_errors' => false
             ]
         );
         $response = $request->getBody()->getContents();
