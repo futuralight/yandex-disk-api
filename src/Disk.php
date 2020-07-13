@@ -402,6 +402,26 @@ class Disk
         $base64 = base64_encode($response);
         return $base64;
     }
+
+    public function getFileInfo($path)
+    {
+        $headers = $this->headers;
+        $headers['User-Agent'] = 'my_application/0.0.1';
+        $headers['Accept-Encoding'] = 'gzip';
+        $headers['Content-Type'] = 'application/x-www-form-urlencoded';
+        $request = $this->client->request(
+            'PROPFIND',
+            "https://webdav.yandex.ru/{$path}",
+            [
+                'headers' => $headers,
+                'http_errors' => false
+            ]
+        );
+        die($request->getBody());
+        $response = $request->getBody()->getContents();
+        return $response;
+    }
+
     /**
      * @return string
      */
