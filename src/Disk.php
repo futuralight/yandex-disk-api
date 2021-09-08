@@ -3,6 +3,7 @@
 namespace Siyahmadde;
 
 use GuzzleHttp\Client;
+use Exception;
 
 /**
  * Class Disk
@@ -336,9 +337,7 @@ class Disk
         $uri = 'https://cloud-api.yandex.net/v1/disk/resources/download?path=' . $path;
         $request = $this->client->request('GET', $uri, ['headers' => $this->headers]);
         $response = $request->getBody()->getContents();
-        $href = json_decode($response)->href;
-        // return copy($href, $path);
-        return $href;
+        return json_decode($response)->href;
     }
 
     public function downloadFile($path)
@@ -376,13 +375,26 @@ class Disk
             ]
         );
         $response = $request->getBody()->getContents();
-        if($request->getStatusCode() !== 404){
+        if ($request->getStatusCode() !== 404) {
             $base64 = base64_encode($response);
             return $base64;
-        }
-        else{
+        } else {
             return $this->getFileWebDav($path);
         }
+    }
+
+    public function moveFile(string $from, string $to): object|bool
+    {
+        $uri = "https://cloud-api.yandex.net/v1/disk/resources/move?from={$from}&path={$to}";
+        $request = $this->client->request('POST', $uri, [
+            'headers' => $this->headers,
+            'http_errors' => false
+        ]);
+        $response = $request->getBody()->getContents();
+        if ($request->getStatusCode() === 404) {
+            return false;
+        }
+        return json_decode($response);
     }
 
     public function getFileWebDav($path)
@@ -417,7 +429,6 @@ class Disk
                 'http_errors' => false
             ]
         );
-        die($request->getBody());
         $response = $request->getBody()->getContents();
         return $response;
     }
