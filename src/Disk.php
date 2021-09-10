@@ -397,6 +397,20 @@ class Disk
         return json_decode($response);
     }
 
+    public function copyFile(string $from, string $to): object|bool
+    {
+        $uri = "https://cloud-api.yandex.net/v1/disk/resources/copy?from={$from}&path={$to}";
+        $request = $this->client->request('POST', $uri, [
+            'headers' => $this->headers,
+            'http_errors' => false
+        ]);
+        $response = $request->getBody()->getContents();
+        if ($request->getStatusCode() === 404) {
+            return false;
+        }
+        return json_decode($response);
+    }
+
     public function getFileWebDav($path)
     {
         $headers = $this->headers;
