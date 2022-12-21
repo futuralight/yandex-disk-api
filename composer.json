@@ -1,19 +1,17 @@
 {
-  "name": "futuralight/yandex-disk-api",
-  "description": "This library is built to use Yandex Disk API with PHP in object oriented way.",
-  "type": "library",
-  "authors": [
-    {
-      "name": "siyahmadde",
-      "email": "fatihjy@gmail.com"
-    }
-  ],
-  "autoload": {
+    "name": "futuralight/yandex-disk-api",
+    "description": "This library is built to use Yandex Disk API with PHP in object oriented way.",
+    "type": "library",
+    "authors": [{
+        "name": "siyahmadde",
+        "email": "fatihjy@gmail.com"
+    }],
+    "autoload": {
         "psr-4": {
             "Siyahmadde\\": "src/"
         }
     },
-  "require": {
-    "guzzlehttp/guzzle": "^6.2"
-  }
+    "require": {
+        "guzzlehttp/guzzle": "^6.2|^7.0"
+    }
 }
