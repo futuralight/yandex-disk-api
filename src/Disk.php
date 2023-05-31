@@ -4,6 +4,7 @@ namespace Siyahmadde;
 
 use GuzzleHttp\Client;
 use Exception;
+use SimpleXMLElement;
 
 /**
  * Class Disk
@@ -445,6 +446,35 @@ class Disk
         );
         $response = $request->getBody()->getContents();
         return $response;
+    }
+
+    /**
+     * publish https://yandex.ru/dev/disk/doc/dg/reference/publish.html
+     * 
+     * Response xml have colon in tags (d:multistatus).
+     * So, you have to use '$xml->children('d', true)->response->propstat->prop->children()->public_url' like constructions.
+     *
+     * @param  string $path
+     * @return void
+     */
+    public function publish(string $path, bool $publish): SimpleXMLElement|bool
+    {
+        $headers = $this->headers;
+        $headers['User-Agent'] = 'my_application/0.0.1';
+        $headers['Accept-Encoding'] = 'gzip';
+        $postBody = $publish ?
+            '<propertyupdate xmlns="DAV:"><set><prop><public_url xmlns="urn:yandex:disk:meta">true</public_url></prop></set></propertyupdate>' :
+            '<propertyupdate xmlns="DAV:"><remove><prop><public_url xmlns="urn:yandex:disk:meta"/></prop></remove></propertyupdate>';
+        $request = $this->client->request(
+            'PROPPATCH',
+            "https://webdav.yandex.ru/{$path}",
+            [
+                'headers' => $headers,
+                'http_errors' => false,
+                'body' => $postBody
+            ]
+        );
+        return simplexml_load_string($request->getBody());
     }
 
     /**
