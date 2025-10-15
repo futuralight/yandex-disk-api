@@ -28,7 +28,7 @@ class Disk
     /**
      * @var Client
      */
-    private $client;
+    private Client $client;
     /**
      * @var string
      */
@@ -365,6 +365,7 @@ class Disk
 
     public function getImagePreview($path, $size = '300x400')
     {
+        $path = $this->encodeWebDavPath($path);
         $headers = $this->headers;
         $headers['User-Agent'] = 'my_application/0.0.1';
         $request = $this->client->request(
@@ -414,6 +415,7 @@ class Disk
 
     public function getFileWebDav($path)
     {
+        $path = $this->encodeWebDavPath($path);
         $headers = $this->headers;
         $headers['User-Agent'] = 'my_application/0.0.1';
         $headers['Accept-Encoding'] = 'gzip';
@@ -432,6 +434,7 @@ class Disk
 
     public function getFileInfo($path)
     {
+        $path = $this->encodeWebDavPath($path);
         $headers = $this->headers;
         $headers['User-Agent'] = 'my_application/0.0.1';
         $headers['Accept-Encoding'] = 'gzip';
@@ -459,6 +462,7 @@ class Disk
      */
     public function publish(string $path, bool $publish): SimpleXMLElement|bool
     {
+        $path = $this->encodeWebDavPath($path);
         $headers = $this->headers;
         $headers['User-Agent'] = 'my_application/0.0.1';
         $headers['Accept-Encoding'] = 'gzip';
@@ -475,6 +479,18 @@ class Disk
             ]
         );
         return simplexml_load_string($request->getBody());
+    }
+
+    /**
+     * Убирает проблемные симолы из пути.
+     * '?', '&', ' ', '+' и т.д. не вызывают проблем
+     *
+     * @param string $path
+     * @return string
+     */
+    private function encodeWebDavPath(string $path): string
+    {
+        return str_replace(['#', '@'], ['%23', '%40'], $path);
     }
 
     /**
